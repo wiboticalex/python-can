@@ -122,7 +122,7 @@ class Usb2canBus(BusABC):
         else:
             status = self.can.send(self.handle, byref(tx))
 
-        if status != CANAL_ERROR_SUCCESS:
+        if status != CanalError.SUCCESS:
             raise CanError("could not send message: status == {}".format(status))
 
 
@@ -137,9 +137,9 @@ class Usb2canBus(BusABC):
             time = 0 if timeout is None else int(timeout * 1000)
             status = self.can.blocking_receive(self.handle, byref(messagerx), time)
 
-        if status == CANAL_ERROR_SUCCESS:
+        if status == CanalError.SUCCESS:
             rx = message_convert_rx(messagerx)
-        elif status == CANAL_ERROR_RCV_EMPTY or status == CANAL_ERROR_TIMEOUT:
+        elif status in (CanalError.RCV_EMPTY, CanalError.TIMEOUT):
             rx = None
         else:
             log.error('Canal Error %s', status)
@@ -155,7 +155,7 @@ class Usb2canBus(BusABC):
         """
         status = self.can.close(self.handle)
 
-        if status != CANAL_ERROR_SUCCESS:
+        if status != CanalError.SUCCESS:
             raise CanError("could not shut down bus: status == {}".format(status))
 
     @staticmethod
